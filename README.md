@@ -1,36 +1,139 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🧞‍♂️ Pantry Genie
 
-## Getting Started
+An AI-powered recipe generator that transforms your available ingredients into delicious, personalized recipes. Built with Next.js 14, TypeScript, and Tailwind CSS.
 
-First, run the development server:
+## ✨ Features
 
+- **AI Recipe Generation**: Input your available ingredients and get complete recipes with instructions, ingredients, and cooking times
+- **Dietary Preferences**: Filter recipes by dietary restrictions (vegetarian, vegan, gluten-free, etc.)
+- **Cuisine Selection**: Choose your preferred cuisine style
+- **Recipe Library**: Save and organize your favorite recipes
+- **Responsive Design**: Beautiful, mobile-first interface
+- **Mock AI Service**: Currently uses mock data, ready for real AI integration
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+ 
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd pantry-genie
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Run the development server:
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Learn More
+## 🏗️ Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+pantry-genie/
+├── app/
+│   ├── components/          # React components
+│   │   ├── navigation.tsx   # Main navigation
+│   │   ├── recipe-card.tsx  # Recipe display component
+│   │   └── recipe-generator.tsx # Recipe generation form
+│   ├── lib/                 # Utility functions and services
+│   │   └── ai-service.ts    # Mock AI service
+│   ├── types/               # TypeScript type definitions
+│   │   └── recipe.ts        # Recipe-related types
+│   ├── library/             # Recipe library page
+│   │   └── page.tsx         # Saved recipes view
+│   ├── layout.tsx           # Root layout
+│   ├── page.tsx             # Home page
+│   └── globals.css          # Global styles
+├── public/                  # Static assets
+└── package.json
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🎯 Core Components
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Recipe Generator
+- Dynamic ingredient input with add/remove functionality
+- Dietary preference selection
+- Cuisine and serving size options
+- Real-time form validation
 
-## Deploy on Vercel
+### Recipe Card
+- Beautiful recipe display with all details
+- Ingredient lists with quantities
+- Step-by-step instructions
+- Cooking time and difficulty indicators
+- Save and edit functionality
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### AI Service
+- Mock AI service that generates realistic recipes
+- Supports different ingredient combinations
+- Adjusts recipes based on preferences
+- Ready for real AI API integration
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🔧 Technology Stack
+
+- **Framework**: Next.js 14 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **State Management**: React hooks
+- **Form Handling**: React Hook Form (ready to integrate)
+- **Validation**: Zod (ready to integrate)
+- **Database**: Supabase (ready to integrate)
+- **AI Integration**: Mock service (ready for OpenAI/Gemini)
+
+## 🚧 Roadmap
+
+### Phase 1: Core Features ✅
+- [x] Recipe generation form
+- [x] Mock AI service
+- [x] Recipe display
+- [x] Basic navigation
+- [x] Recipe library page
+
+### Phase 2: Authentication & Database
+- [ ] Supabase integration
+- [ ] User authentication
+- [ ] Recipe saving functionality
+- [ ] User profile management
+
+### Phase 3: Real AI Integration
+- [ ] OpenAI/Gemini API integration
+- [ ] Advanced recipe generation
+- [ ] Recipe variations
+- [ ] Nutritional information
+
+### Phase 4: Enhanced Features
+- [ ] Recipe sharing
+- [ ] Meal planning
+- [ ] Shopping list generation
+- [ ] Recipe ratings and reviews
+- [ ] Social features
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Built with Next.js and Tailwind CSS
+- Inspired by the need to reduce food waste and make cooking more accessible
+- Ready for real AI integration with OpenAI, Gemini, or other providers
