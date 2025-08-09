@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { InputField } from '../components/input-field'
 import { Progress } from '../components/ui/progress'
 import { supabase } from '../lib/supabase'
+import { useToast } from '../components/ui/toast'
 
 interface FormData {
   email: string
@@ -19,6 +20,7 @@ interface FormErrors {
 
 export default function LoginPage() {
   const router = useRouter()
+  const { showToast } = useToast()
   const [formData, setFormData] = useState<FormData>({
     email: '',
     password: ''
@@ -146,6 +148,12 @@ export default function LoginPage() {
     } catch (error) {
       console.error('Login error:', error)
       setErrors({ password: 'Invalid email or password. Please try again.' })
+      showToast({
+        type: 'error',
+        title: 'Login Failed',
+        message: 'Invalid email or password. Please try again.',
+        duration: 5000
+      })
     } finally {
       setIsLoading(false)
       setProgress(0)

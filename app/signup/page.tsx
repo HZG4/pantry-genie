@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { InputField } from '../components/input-field'
 import { Progress } from '../components/ui/progress'
 import { supabase } from '../lib/supabase'
+import { useToast } from '../components/ui/toast'
 
 interface FormData {
   name: string
@@ -23,6 +24,7 @@ interface FormErrors {
 
 export default function SignupPage() {
   const router = useRouter()
+  const { showToast } = useToast()
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
@@ -115,15 +117,32 @@ export default function SignupPage() {
        }
       
       // Show success message and redirect to login
-      alert('Account created successfully! Please check your email for verification.')
+      showToast({
+        type: 'success',
+        title: 'Account Created!',
+        message: 'Please check your email for verification.',
+        duration: 4000
+      })
       router.push('/login')
       
     } catch (error: any) {
       console.error('Signup error:', error)
       if (error.message?.includes('email')) {
         setErrors({ email: 'This email is already registered. Please try logging in instead.' })
+        showToast({
+          type: 'error',
+          title: 'Email Already Exists',
+          message: 'This email is already registered. Please try logging in instead.',
+          duration: 5000
+        })
       } else {
         setErrors({ password: 'Failed to create account. Please try again.' })
+        showToast({
+          type: 'error',
+          title: 'Signup Failed',
+          message: 'Failed to create account. Please try again.',
+          duration: 5000
+        })
       }
     } finally {
       setIsLoading(false)

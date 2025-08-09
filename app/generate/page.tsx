@@ -9,9 +9,11 @@ import Image from 'next/image'
 import { Progress } from '../components/ui/progress'
 import { useAuth } from '../hooks/use-auth'
 import { recipeService } from '../lib/database'
+import { useToast } from '../components/ui/toast'
 
 export default function GeneratePage() {
   const { user, getUserAvatar } = useAuth()
+  const { showToast } = useToast()
   const [generatedRecipe, setGeneratedRecipe] = useState<Recipe | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -77,7 +79,12 @@ export default function GeneratePage() {
 
   const handleEditRecipe = () => {
     // TODO: Implement edit functionality
-    alert('Edit functionality coming soon!')
+    showToast({
+      type: 'info',
+      title: 'Coming Soon!',
+      message: 'Edit functionality will be available in the next update.',
+      duration: 3000
+    })
   }
 
   const handleSaveRecipe = async () => {
@@ -85,10 +92,20 @@ export default function GeneratePage() {
 
     try {
       await recipeService.saveRecipe(generatedRecipe, user.id)
-      alert('Recipe saved successfully!')
+      showToast({
+        type: 'success',
+        title: 'Recipe Saved!',
+        message: 'Your recipe has been added to your library.',
+        duration: 4000
+      })
     } catch (err) {
       console.error('Error saving recipe:', err)
-      alert('Failed to save recipe. Please try again.')
+      showToast({
+        type: 'error',
+        title: 'Save Failed',
+        message: 'Failed to save recipe. Please try again.',
+        duration: 5000
+      })
     }
   }
 

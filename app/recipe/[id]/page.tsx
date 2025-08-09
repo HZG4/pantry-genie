@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation'
 import type { Recipe } from '../../types/recipe'
 import { useAuth } from '../../hooks/use-auth'
 import { recipeService } from '../../lib/database'
+import { useToast } from '../../components/ui/toast'
 
 // Mock data for demonstration - will be replaced with Supabase data
 const mockRecipes: Recipe[] = [
@@ -148,6 +149,7 @@ const mockRecipes: Recipe[] = [
 
 export default function RecipeDetailPage() {
   const { getUserAvatar } = useAuth()
+  const { showToast } = useToast()
   const params = useParams()
   const router = useRouter()
   const [recipe, setRecipe] = useState<Recipe | null>(null)
@@ -185,7 +187,12 @@ export default function RecipeDetailPage() {
 
   const handleEditRecipe = () => {
     // TODO: Navigate to edit page or open edit modal
-    alert('Edit functionality coming soon!')
+    showToast({
+      type: 'info',
+      title: 'Coming Soon!',
+      message: 'Edit functionality will be available in the next update.',
+      duration: 3000
+    })
   }
 
   const handleDeleteRecipe = async () => {
@@ -194,11 +201,21 @@ export default function RecipeDetailPage() {
     if (confirm('Are you sure you want to delete this recipe?')) {
       try {
         await recipeService.deleteRecipe(recipe.id)
-        alert('Recipe deleted successfully!')
+        showToast({
+          type: 'success',
+          title: 'Recipe Deleted',
+          message: 'Recipe has been removed from your library.',
+          duration: 3000
+        })
         router.push('/library')
       } catch (err) {
         console.error('Error deleting recipe:', err)
-        alert('Failed to delete recipe. Please try again.')
+        showToast({
+          type: 'error',
+          title: 'Delete Failed',
+          message: 'Failed to delete recipe. Please try again.',
+          duration: 5000
+        })
       }
     }
   }
@@ -214,7 +231,12 @@ export default function RecipeDetailPage() {
     } else {
       // Fallback: copy to clipboard
       navigator.clipboard.writeText(window.location.href)
-      alert('Recipe link copied to clipboard!')
+      showToast({
+        type: 'success',
+        title: 'Link Copied!',
+        message: 'Recipe link has been copied to your clipboard.',
+        duration: 3000
+      })
     }
   }
 

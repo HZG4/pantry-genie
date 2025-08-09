@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Noto_Sans } from "next/font/google";
 import "./globals.css";
+import { ToastProvider } from "./components/ui/toast";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -32,7 +33,9 @@ export default function RootLayout({
           fontFamily: '"Space Grotesk", "Noto Sans", sans-serif'
         }}
       >
-        {children}
+        <ToastProvider>
+          {children}
+        </ToastProvider>
       </body>
     </html>
   );

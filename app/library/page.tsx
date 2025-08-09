@@ -5,9 +5,11 @@ import Link from 'next/link'
 import type { Recipe } from '../types/recipe'
 import { useAuth } from '../hooks/use-auth'
 import { recipeService } from '../lib/database'
+import { useToast } from '../components/ui/toast'
 
 export default function LibraryPage() {
   const { user, getUserAvatar } = useAuth()
+  const { showToast } = useToast()
   const [searchQuery, setSearchQuery] = useState('')
   const [recipes, setRecipes] = useState<Recipe[]>([])
   const [loading, setLoading] = useState(true)
@@ -87,9 +89,20 @@ export default function LibraryPage() {
     try {
       await recipeService.deleteRecipe(recipeId)
       setRecipes(recipes.filter(recipe => recipe.id !== recipeId))
+      showToast({
+        type: 'success',
+        title: 'Recipe Deleted',
+        message: 'Recipe has been removed from your library.',
+        duration: 3000
+      })
     } catch (err) {
       console.error('Error deleting recipe:', err)
-      alert('Failed to delete recipe. Please try again.')
+      showToast({
+        type: 'error',
+        title: 'Delete Failed',
+        message: 'Failed to delete recipe. Please try again.',
+        duration: 5000
+      })
     }
   }
 
