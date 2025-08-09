@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import type { Recipe } from '../../types/recipe'
+import { useAuth } from '../../hooks/use-auth'
+import { recipeService } from '../../lib/database'
 
 // Mock data for demonstration - will be replaced with Supabase data
 const mockRecipes: Recipe[] = [
@@ -111,26 +113,26 @@ const mockRecipes: Recipe[] = [
     servings: 6,
     difficulty: 'easy',
     cuisine: 'mexican',
-    dietaryTags: ['vegetarian', 'vegan'],
+    dietaryTags: ['vegetarian', 'high-fiber'],
     createdAt: new Date(),
     updatedAt: new Date()
   },
   {
     id: '5',
     title: 'Chocolate Chip Cookies',
-    description: 'Classic cookies with gooey chocolate chips.',
+    description: 'Classic homemade cookies with a soft center and crispy edges.',
     ingredients: [
-      { name: 'flour', amount: 2.5, unit: 'cups' },
+      { name: 'all-purpose flour', amount: 2.25, unit: 'cups' },
       { name: 'butter', amount: 1, unit: 'cup' },
-      { name: 'chocolate chips', amount: 2, unit: 'cups' },
-      { name: 'eggs', amount: 2, unit: 'pieces' },
-      { name: 'vanilla', amount: 1, unit: 'tsp' }
+      { name: 'brown sugar', amount: 0.75, unit: 'cup' },
+      { name: 'white sugar', amount: 0.75, unit: 'cup' },
+      { name: 'chocolate chips', amount: 2, unit: 'cups' }
     ],
     instructions: [
-      'Cream butter and sugar',
+      'Cream butter and sugars',
       'Add eggs and vanilla',
-      'Mix in flour and chocolate chips',
-      'Drop onto baking sheet',
+      'Mix in dry ingredients',
+      'Fold in chocolate chips',
       'Bake at 375°F for 10-12 minutes'
     ],
     prepTime: 15,
@@ -141,37 +143,11 @@ const mockRecipes: Recipe[] = [
     dietaryTags: ['dessert'],
     createdAt: new Date(),
     updatedAt: new Date()
-  },
-  {
-    id: '6',
-    title: 'Apple Crumble',
-    description: 'Warm and comforting dessert with a crispy topping.',
-    ingredients: [
-      { name: 'apples', amount: 6, unit: 'medium' },
-      { name: 'flour', amount: 1, unit: 'cup' },
-      { name: 'oats', amount: 1, unit: 'cup' },
-      { name: 'brown sugar', amount: 1, unit: 'cup' },
-      { name: 'cinnamon', amount: 1, unit: 'tsp' }
-    ],
-    instructions: [
-      'Slice apples and place in baking dish',
-      'Mix flour, oats, sugar, and cinnamon',
-      'Sprinkle topping over apples',
-      'Bake at 375°F for 30 minutes',
-      'Serve warm with ice cream'
-    ],
-    prepTime: 20,
-    cookTime: 30,
-    servings: 8,
-    difficulty: 'easy',
-    cuisine: 'american',
-    dietaryTags: ['dessert', 'vegetarian'],
-    createdAt: new Date(),
-    updatedAt: new Date()
   }
 ]
 
 export default function RecipeDetailPage() {
+  const { getUserAvatar } = useAuth()
   const params = useParams()
   const router = useRouter()
   const [recipe, setRecipe] = useState<Recipe | null>(null)
@@ -184,15 +160,12 @@ export default function RecipeDetailPage() {
       setError(null)
 
       try {
-        // TODO: Replace with actual Supabase data fetching
-        // const { data, error } = await supabase
-        //   .from('saved_recipes')
-        //   .select('*')
-        //   .eq('id', params.id)
-        //   .single()
-        
-        // For now, use mock data
-        const foundRecipe = mockRecipes.find(r => r.id === params.id)
+        if (!params.id) {
+          setError('Recipe ID is required')
+          return
+        }
+
+        const foundRecipe = await recipeService.getRecipeById(params.id as string)
         
         if (foundRecipe) {
           setRecipe(foundRecipe)
@@ -207,9 +180,7 @@ export default function RecipeDetailPage() {
       }
     }
 
-    if (params.id) {
-      fetchRecipe()
-    }
+    fetchRecipe()
   }, [params.id])
 
   const handleEditRecipe = () => {
@@ -217,12 +188,18 @@ export default function RecipeDetailPage() {
     alert('Edit functionality coming soon!')
   }
 
-  const handleDeleteRecipe = () => {
-    // TODO: Implement delete functionality with Supabase
+  const handleDeleteRecipe = async () => {
+    if (!recipe) return
+
     if (confirm('Are you sure you want to delete this recipe?')) {
-      alert('Delete functionality will be implemented with backend integration!')
-      // After successful deletion, navigate back to library
-      // router.push('/library')
+      try {
+        await recipeService.deleteRecipe(recipe.id)
+        alert('Recipe deleted successfully!')
+        router.push('/library')
+      } catch (err) {
+        console.error('Error deleting recipe:', err)
+        alert('Failed to delete recipe. Please try again.')
+      }
     }
   }
 
@@ -246,14 +223,19 @@ export default function RecipeDetailPage() {
       <div
         className="relative flex size-full min-h-screen flex-col bg-[#fcf9f8] group/design-root overflow-x-hidden"
         style={{
-          '--select-button-svg': 'url(\'data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2724px%27 height=%2724px%27 fill=%27rgb(154,102,76)%27 viewBox=%270 0 256 256%27%3e%3cpath d=%27M181.66,170.34a8,8,0,0,1,0,11.32l-48,48a8,8,0,0,1-11.32,0l-48-48a8,8,0,0,1,11.32-11.32L128,212.69l42.34-42.35A8,8,0,0,1,181.66,170.34Zm-96-84.68L128,43.31l42.34,42.35a8,8,0,0,0,11.32-11.32l-48-48a8,8,0,0,0-11.32,0l-48,48A8,8,0,0,0,85.66,85.66Z%27%3e%3c/path%3e%3c/svg%3e\')'
+          '--select-button-svg': 'url(\'data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2724px%27 height=%2724px%27 fill=%27rgb(154,102,76)%27 viewBox=%270 0 256 256%27%3e%3cpath d=%27M181.66,170.34a8,8,0,0,1,0,11.32l-48,48a8,8,0,0,1,11.32,0l-48-48a8,8,0,0,1,11.32-11.32L128,212.69l42.34-42.35A8,8,0,0,1,181.66,170.34Zm-96-84.68L128,43.31l42.34,42.35a8,8,0,0,0,11.32-11.32l-48-48a8,8,0,0,0-11.32,0l-48,48A8,8,0,0,0,85.66,85.66Z%27%3e%3c/path%3e%3c/svg%3e\')'
         } as React.CSSProperties}
       >
         <div className="layout-container flex h-full grow flex-col">
           {/* Header */}
           <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f3ebe7] px-10 py-3">
             <div className="flex items-center gap-4 text-[#1b120d]">
-              <h2 className="text-[#1b120d] text-lg font-bold leading-tight tracking-[-0.015em]">Pantry Genie</h2>
+              <Link href="/" className="hover:opacity-80 transition-opacity">
+                <h2 className="text-[#1b120d] text-xl font-black leading-tight tracking-[-0.015em]">
+                  <span className="text-[#ee6c2b]">Pantry</span>{' '}
+                  <span className="text-[#22c55e]">Genie</span>
+                </h2>
+              </Link>
             </div>
             <div className="flex flex-1 justify-end gap-8">
               <div className="flex items-center gap-9">
@@ -263,7 +245,7 @@ export default function RecipeDetailPage() {
               <div
                 className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
                 style={{
-                  backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAV9TKwSwIjOKctAV3h1fx8E-ZDwPRfjMUGEO4a1CQIcJX5NUupRnFE3ANUqopg-E-vYdnjxmwFS2sPVd8uT73u2SYrZ9lz5aM1CakUrW9YVaQLbUc5GpND5IAEbc_SKP3D3WBCheB9NTHkdHZg_-0lBKxkz8n-P-QCxlpOVCWLIIEE23wLdGKZnTOsyZmv1zXYEdbIN-1nkOnnJahS4v4Yb93jLblAzSwTR3pwGVa9uCJNYV1F-IvC0fB5EAE7Kg70EhoywJ7qN00k")'
+                  backgroundImage: `url("${getUserAvatar()}")`
                 }}
               ></div>
             </div>
@@ -288,14 +270,19 @@ export default function RecipeDetailPage() {
       <div
         className="relative flex size-full min-h-screen flex-col bg-[#fcf9f8] group/design-root overflow-x-hidden"
         style={{
-          '--select-button-svg': 'url(\'data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2724px%27 height=%2724px%27 fill=%27rgb(154,102,76)%27 viewBox=%270 0 256 256%27%3e%3cpath d=%27M181.66,170.34a8,8,0,0,1,0,11.32l-48,48a8,8,0,0,1-11.32,0l-48-48a8,8,0,0,1,11.32-11.32L128,212.69l42.34-42.35A8,8,0,0,1,181.66,170.34Zm-96-84.68L128,43.31l42.34,42.35a8,8,0,0,0,11.32-11.32l-48-48a8,8,0,0,0-11.32,0l-48,48A8,8,0,0,0,85.66,85.66Z%27%3e%3c/path%3e%3c/svg%3e\')'
+          '--select-button-svg': 'url(\'data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2724px%27 height=%2724px%27 fill=%27rgb(154,102,76)%27 viewBox=%270 0 256 256%27%3e%3cpath d=%27M181.66,170.34a8,8,0,0,1,0,11.32l-48,48a8,8,0,0,1,11.32,0l-48-48a8,8,0,0,1,11.32-11.32L128,212.69l42.34-42.35A8,8,0,0,1,181.66,170.34Zm-96-84.68L128,43.31l42.34,42.35a8,8,0,0,0,11.32-11.32l-48-48a8,8,0,0,0-11.32,0l-48,48A8,8,0,0,0,85.66,85.66Z%27%3e%3c/path%3e%3c/svg%3e\')'
         } as React.CSSProperties}
       >
         <div className="layout-container flex h-full grow flex-col">
           {/* Header */}
           <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f3ebe7] px-10 py-3">
             <div className="flex items-center gap-4 text-[#1b120d]">
-              <h2 className="text-[#1b120d] text-lg font-bold leading-tight tracking-[-0.015em]">Pantry Genie</h2>
+              <Link href="/" className="hover:opacity-80 transition-opacity">
+                <h2 className="text-[#1b120d] text-xl font-black leading-tight tracking-[-0.015em]">
+                  <span className="text-[#ee6c2b]">Pantry</span>{' '}
+                  <span className="text-[#22c55e]">Genie</span>
+                </h2>
+              </Link>
             </div>
             <div className="flex flex-1 justify-end gap-8">
               <div className="flex items-center gap-9">
@@ -305,7 +292,7 @@ export default function RecipeDetailPage() {
               <div
                 className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
                 style={{
-                  backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAV9TKwSwIjOKctAV3h1fx8E-ZDwPRfjMUGEO4a1CQIcJX5NUupRnFE3ANUqopg-E-vYdnjxmwFS2sPVd8uT73u2SYrZ9lz5aM1CakUrW9YVaQLbUc5GpND5IAEbc_SKP3D3WBCheB9NTHkdHZg_-0lBKxkz8n-P-QCxlpOVCWLIIEE23wLdGKZnTOsyZmv1zXYEdbIN-1nkOnnJahS4v4Yb93jLblAzSwTR3pwGVa9uCJNYV1F-IvC0fB5EAE7Kg70EhoywJ7qN00k")'
+                  backgroundImage: `url("${getUserAvatar()}")`
                 }}
               ></div>
             </div>
@@ -335,14 +322,19 @@ export default function RecipeDetailPage() {
     <div
       className="relative flex size-full min-h-screen flex-col bg-[#fcf9f8] group/design-root overflow-x-hidden"
       style={{
-        '--select-button-svg': 'url(\'data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2724px%27 height=%2724px%27 fill=%27rgb(154,102,76)%27 viewBox=%270 0 256 256%27%3e%3cpath d=%27M181.66,170.34a8,8,0,0,1,0,11.32l-48,48a8,8,0,0,1-11.32,0l-48-48a8,8,0,0,1,11.32-11.32L128,212.69l42.34-42.35A8,8,0,0,1,181.66,170.34Zm-96-84.68L128,43.31l42.34,42.35a8,8,0,0,0,11.32-11.32l-48-48a8,8,0,0,0-11.32,0l-48,48A8,8,0,0,0,85.66,85.66Z%27%3e%3c/path%3e%3c/svg%3e\')'
+        '--select-button-svg': 'url(\'data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2724px%27 height=%2724px%27 fill=%27rgb(154,102,76)%27 viewBox=%270 0 256 256%27%3e%3cpath d=%27M181.66,170.34a8,8,0,0,1,0,11.32l-48,48a8,8,0,0,1,11.32,0l-48-48a8,8,0,0,1,11.32-11.32L128,212.69l42.34-42.35A8,8,0,0,1,181.66,170.34Zm-96-84.68L128,43.31l42.34,42.35a8,8,0,0,0,11.32-11.32l-48-48a8,8,0,0,0-11.32,0l-48,48A8,8,0,0,0,85.66,85.66Z%27%3e%3c/path%3e%3c/svg%3e\')'
       } as React.CSSProperties}
     >
       <div className="layout-container flex h-full grow flex-col">
         {/* Header */}
         <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f3ebe7] px-10 py-3">
           <div className="flex items-center gap-4 text-[#1b120d]">
-            <h2 className="text-[#1b120d] text-lg font-bold leading-tight tracking-[-0.015em]">Pantry Genie</h2>
+            <Link href="/" className="hover:opacity-80 transition-opacity">
+              <h2 className="text-[#1b120d] text-xl font-black leading-tight tracking-[-0.015em]">
+                <span className="text-[#ee6c2b]">Pantry</span>{' '}
+                <span className="text-[#22c55e]">Genie</span>
+              </h2>
+            </Link>
           </div>
           <div className="flex flex-1 justify-end gap-8">
             <div className="flex items-center gap-9">
@@ -352,7 +344,7 @@ export default function RecipeDetailPage() {
             <div
               className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
               style={{
-                backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAV9TKwSwIjOKctAV3h1fx8E-ZDwPRfjMUGEO4a1CQIcJX5NUupRnFE3ANUqopg-E-vYdnjxmwFS2sPVd8uT73u2SYrZ9lz5aM1CakUrW9YVaQLbUc5GpND5IAEbc_SKP3D3WBCheB9NTHkdHZg_-0lBKxkz8n-P-QCxlpOVCWLIIEE23wLdGKZnTOsyZmv1zXYEdbIN-1nkOnnJahS4v4Yb93jLblAzSwTR3pwGVa9uCJNYV1F-IvC0fB5EAE7Kg70EhoywJ7qN00k")'
+                backgroundImage: `url("${getUserAvatar()}")`
               }}
             ></div>
           </div>
@@ -360,112 +352,107 @@ export default function RecipeDetailPage() {
 
         <div className="px-40 flex flex-1 justify-center py-5">
           <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
-            {/* Recipe Title */}
-            <div className="flex flex-wrap justify-between gap-3 p-4">
-              <p className="text-[#1b120d] tracking-light text-[32px] font-bold leading-tight min-w-72">{recipe.title}</p>
-            </div>
-            
-            {/* Recipe Image */}
-            <div className="flex w-full grow bg-[#fcf9f8] @container p-4">
-              <div className="w-full gap-1 overflow-hidden bg-[#fcf9f8] @[480px]:gap-2 aspect-[3/2] rounded-xl flex">
-                <div
-                  className="w-full bg-center bg-no-repeat bg-cover aspect-auto rounded-none flex-1"
-                  style={{
-                    backgroundImage: `url("https://images.unsplash.com/photo-${recipe.id === '1' ? '1563379926898-05f4575a45d8' : 
-                      recipe.id === '2' ? '1621996346565-e3dbc353d2e5' :
-                      recipe.id === '3' ? '1546069902-ba9599a7e63c' :
-                      recipe.id === '4' ? '1544025162-0be1a038a1b8' :
-                      recipe.id === '5' ? '1499636136210-6026e6c0e231' :
-                      '1504674900204-0697e668a1c7'}?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80")`
-                  }}
-                ></div>
+            {/* Recipe Content */}
+            <div className="bg-white rounded-lg shadow-lg p-8">
+              {/* Recipe Header */}
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h1 className="text-3xl font-bold text-[#1b120d] mb-2">{recipe.title}</h1>
+                  <p className="text-[#9a664c] text-lg">{recipe.description}</p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleEditRecipe}
+                    className="bg-[#ee6c2b] hover:bg-[#d55a1f] text-white px-4 py-2 rounded-lg transition-colors"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={handleDeleteRecipe}
+                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
+                  >
+                    Delete
+                  </button>
+                  <button
+                    onClick={handleShareRecipe}
+                    className="bg-[#22c55e] hover:bg-[#16a34a] text-white px-4 py-2 rounded-lg transition-colors"
+                  >
+                    Share
+                  </button>
+                </div>
               </div>
-            </div>
 
-            {/* Recipe Meta Info */}
-            {recipe.description && (
-              <div className="px-4 py-2">
-                <p className="text-[#9a664c] text-base font-normal leading-normal">{recipe.description}</p>
-              </div>
-            )}
-
-            <div className="flex flex-wrap gap-4 px-4 py-2">
-              <div className="flex items-center gap-2">
-                <span className="text-[#1b120d] text-sm font-medium">⏱️ Prep: {recipe.prepTime}m</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-[#1b120d] text-sm font-medium">🔥 Cook: {recipe.cookTime}m</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-[#1b120d] text-sm font-medium">👥 Serves: {recipe.servings}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-[#1b120d] text-sm font-medium capitalize">📊 Difficulty: {recipe.difficulty}</span>
-              </div>
-              {recipe.cuisine && (
-                <div className="flex items-center gap-2">
-                  <span className="text-[#1b120d] text-sm font-medium capitalize">🌍 Cuisine: {recipe.cuisine}</span>
+              {/* Recipe Image */}
+              {recipe.imageUrl && (
+                <div className="mb-8">
+                  <div className="w-full h-64 bg-center bg-no-repeat bg-cover rounded-xl"
+                    style={{
+                      backgroundImage: `url("${recipe.imageUrl}")`
+                    }}
+                  ></div>
                 </div>
               )}
-            </div>
 
-            {/* Dietary Tags */}
-            {recipe.dietaryTags.length > 0 && (
-              <div className="flex flex-wrap gap-2 px-4 py-2">
+              {/* Recipe Info */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 p-4 bg-[#f3ebe7] rounded-lg">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-[#ee6c2b]">{recipe.prepTime}</div>
+                  <div className="text-sm text-[#9a664c]">Prep Time (min)</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-[#ee6c2b]">{recipe.cookTime}</div>
+                  <div className="text-sm text-[#9a664c]">Cook Time (min)</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-[#ee6c2b]">{recipe.servings}</div>
+                  <div className="text-sm text-[#9a664c]">Servings</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-[#ee6c2b] capitalize">{recipe.difficulty}</div>
+                  <div className="text-sm text-[#9a664c]">Difficulty</div>
+                </div>
+              </div>
+
+              {/* Ingredients */}
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-[#1b120d] mb-4">Ingredients</h2>
+                <ul className="space-y-2">
+                  {recipe.ingredients.map((ingredient, index) => (
+                    <li key={index} className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-[#ee6c2b] rounded-full"></span>
+                      <span className="text-[#1b120d]">
+                        {ingredient.amount} {ingredient.unit} {ingredient.name}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Instructions */}
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-[#1b120d] mb-4">Instructions</h2>
+                <ol className="space-y-4">
+                  {recipe.instructions.map((instruction, index) => (
+                    <li key={index} className="flex gap-4">
+                      <span className="flex-shrink-0 w-8 h-8 bg-[#ee6c2b] text-white rounded-full flex items-center justify-center font-bold">
+                        {index + 1}
+                      </span>
+                      <span className="text-[#1b120d] leading-relaxed">{instruction}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+
+              {/* Tags */}
+              <div className="flex flex-wrap gap-2">
+                <span className="px-3 py-1 bg-[#f3ebe7] text-[#9a664c] rounded-full text-sm capitalize">
+                  {recipe.cuisine}
+                </span>
                 {recipe.dietaryTags.map((tag, index) => (
-                  <span
-                    key={index}
-                    className="px-3 py-1 bg-[#f3ebe7] text-[#1b120d] text-xs rounded-full capitalize"
-                  >
+                  <span key={index} className="px-3 py-1 bg-[#e7d7cf] text-[#1b120d] rounded-full text-sm">
                     {tag}
                   </span>
                 ))}
-              </div>
-            )}
-
-            {/* Ingredients */}
-            <h3 className="text-[#1b120d] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Ingredients</h3>
-            <ul className="text-[#1b120d] text-base font-normal leading-normal pb-3 pt-1 px-4 space-y-1">
-              {recipe.ingredients.map((ingredient, index) => (
-                <li key={index}>• {ingredient.amount} {ingredient.unit} {ingredient.name}</li>
-              ))}
-            </ul>
-
-            {/* Instructions */}
-            <h3 className="text-[#1b120d] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Instructions</h3>
-            <ol className="text-[#1b120d] text-base font-normal leading-normal pb-3 pt-1 px-4 space-y-2">
-              {recipe.instructions.map((instruction, index) => (
-                <li key={index}>{index + 1}. {instruction}</li>
-              ))}
-            </ol>
-
-            {/* Action Buttons */}
-            <div className="flex justify-stretch">
-              <div className="flex flex-1 gap-3 flex-wrap px-4 py-3 justify-start">
-                <button
-                  onClick={handleEditRecipe}
-                  className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#ee6c2b] text-[#fcf9f8] text-sm font-bold leading-normal tracking-[0.015em]"
-                >
-                  <span className="truncate">Edit Recipe</span>
-                </button>
-                <button
-                  onClick={handleShareRecipe}
-                  className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#f3ebe7] text-[#1b120d] text-sm font-bold leading-normal tracking-[0.015em]"
-                >
-                  <span className="truncate">Share</span>
-                </button>
-                <button
-                  onClick={handleDeleteRecipe}
-                  className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-red-100 text-red-700 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-red-200"
-                >
-                  <span className="truncate">Delete</span>
-                </button>
-                <Link
-                  href="/library"
-                  className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#f3ebe7] text-[#1b120d] text-sm font-bold leading-normal tracking-[0.015em]"
-                >
-                  <span className="truncate">Back to My Recipes</span>
-                </Link>
               </div>
             </div>
           </div>

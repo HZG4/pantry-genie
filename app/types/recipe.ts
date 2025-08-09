@@ -10,6 +10,7 @@ export interface Recipe {
   difficulty: 'easy' | 'medium' | 'hard'
   cuisine?: string
   dietaryTags: string[]
+  imageUrl?: string // AI-generated food image
   createdAt: Date
   updatedAt: Date
   userId?: string // for saved recipes
@@ -50,4 +51,32 @@ export interface SavedRecipe {
   savedAt: Date
   notes?: string
   rating?: number
+}
+
+// Database types matching Supabase schema
+export interface DatabaseRecipe {
+  id: string
+  user_id: string
+  title: string
+  description?: string
+  ingredients: RecipeIngredient[]
+  instructions: string[]
+  prep_time: number
+  cook_time: number
+  servings: number
+  difficulty: 'easy' | 'medium' | 'hard'
+  cuisine: string
+  dietary_tags: string[]
+  image_url?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface UserProfile {
+  id: string
+  name?: string
+  avatar_url?: string
+  preferences?: Record<string, any>
+  created_at: string
+  updated_at: string
 }

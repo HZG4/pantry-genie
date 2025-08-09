@@ -1,207 +1,117 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import type { Recipe } from '../types/recipe'
-
-// Mock data for demonstration - will be replaced with Supabase data
-const mockRecipes: Recipe[] = [
-  {
-    id: '1',
-    title: 'Spicy Chicken Stir-Fry',
-    description: 'Quick and flavorful stir-fry with a spicy kick.',
-    ingredients: [
-      { name: 'chicken breast', amount: 1, unit: 'lb' },
-      { name: 'soy sauce', amount: 2, unit: 'tbsp' },
-      { name: 'garlic', amount: 3, unit: 'cloves' },
-      { name: 'ginger', amount: 1, unit: 'tbsp' },
-      { name: 'vegetables', amount: 2, unit: 'cups' }
-    ],
-    instructions: [
-      'Cut chicken into bite-sized pieces',
-      'Heat oil in a wok or large skillet',
-      'Add chicken and cook until golden',
-      'Add vegetables and stir-fry',
-      'Season with soy sauce and serve'
-    ],
-    prepTime: 15,
-    cookTime: 20,
-    servings: 4,
-    difficulty: 'medium',
-    cuisine: 'asian',
-    dietaryTags: ['high-protein'],
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: '2',
-    title: 'Creamy Tomato Pasta',
-    description: 'Rich and creamy pasta with a hint of sweetness.',
-    ingredients: [
-      { name: 'pasta', amount: 1, unit: 'lb' },
-      { name: 'tomatoes', amount: 4, unit: 'medium' },
-      { name: 'heavy cream', amount: 1, unit: 'cup' },
-      { name: 'garlic', amount: 4, unit: 'cloves' },
-      { name: 'basil', amount: 1/4, unit: 'cup' }
-    ],
-    instructions: [
-      'Cook pasta according to package instructions',
-      'Sauté garlic in olive oil',
-      'Add tomatoes and cook until softened',
-      'Stir in cream and simmer',
-      'Toss with pasta and basil'
-    ],
-    prepTime: 10,
-    cookTime: 25,
-    servings: 4,
-    difficulty: 'easy',
-    cuisine: 'italian',
-    dietaryTags: ['vegetarian'],
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: '3',
-    title: 'Lemon Herb Roasted Salmon',
-    description: 'Flaky salmon with a zesty lemon and herb crust.',
-    ingredients: [
-      { name: 'salmon fillets', amount: 4, unit: 'pieces' },
-      { name: 'lemon', amount: 2, unit: 'pieces' },
-      { name: 'fresh herbs', amount: 1/4, unit: 'cup' },
-      { name: 'olive oil', amount: 2, unit: 'tbsp' },
-      { name: 'garlic', amount: 3, unit: 'cloves' }
-    ],
-    instructions: [
-      'Preheat oven to 400°F',
-      'Season salmon with herbs and lemon',
-      'Place on baking sheet',
-      'Roast for 12-15 minutes',
-      'Serve with lemon wedges'
-    ],
-    prepTime: 10,
-    cookTime: 15,
-    servings: 4,
-    difficulty: 'easy',
-    cuisine: 'mediterranean',
-    dietaryTags: ['high-protein', 'omega-3'],
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: '4',
-    title: 'Vegetarian Chili',
-    description: 'Hearty and comforting chili packed with vegetables.',
-    ingredients: [
-      { name: 'kidney beans', amount: 2, unit: 'cans' },
-      { name: 'bell peppers', amount: 2, unit: 'pieces' },
-      { name: 'onion', amount: 1, unit: 'large' },
-      { name: 'tomatoes', amount: 28, unit: 'oz can' },
-      { name: 'chili powder', amount: 2, unit: 'tbsp' }
-    ],
-    instructions: [
-      'Sauté onions and peppers',
-      'Add beans and tomatoes',
-      'Season with chili powder',
-      'Simmer for 30 minutes',
-      'Serve with toppings'
-    ],
-    prepTime: 15,
-    cookTime: 30,
-    servings: 6,
-    difficulty: 'easy',
-    cuisine: 'mexican',
-    dietaryTags: ['vegetarian', 'vegan'],
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: '5',
-    title: 'Chocolate Chip Cookies',
-    description: 'Classic cookies with gooey chocolate chips.',
-    ingredients: [
-      { name: 'flour', amount: 2.5, unit: 'cups' },
-      { name: 'butter', amount: 1, unit: 'cup' },
-      { name: 'chocolate chips', amount: 2, unit: 'cups' },
-      { name: 'eggs', amount: 2, unit: 'pieces' },
-      { name: 'vanilla', amount: 1, unit: 'tsp' }
-    ],
-    instructions: [
-      'Cream butter and sugar',
-      'Add eggs and vanilla',
-      'Mix in flour and chocolate chips',
-      'Drop onto baking sheet',
-      'Bake at 375°F for 10-12 minutes'
-    ],
-    prepTime: 15,
-    cookTime: 12,
-    servings: 24,
-    difficulty: 'easy',
-    cuisine: 'american',
-    dietaryTags: ['dessert'],
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: '6',
-    title: 'Apple Crumble',
-    description: 'Warm and comforting dessert with a crispy topping.',
-    ingredients: [
-      { name: 'apples', amount: 6, unit: 'medium' },
-      { name: 'flour', amount: 1, unit: 'cup' },
-      { name: 'oats', amount: 1, unit: 'cup' },
-      { name: 'brown sugar', amount: 1, unit: 'cup' },
-      { name: 'cinnamon', amount: 1, unit: 'tsp' }
-    ],
-    instructions: [
-      'Slice apples and place in baking dish',
-      'Mix flour, oats, sugar, and cinnamon',
-      'Sprinkle topping over apples',
-      'Bake at 375°F for 30 minutes',
-      'Serve warm with ice cream'
-    ],
-    prepTime: 20,
-    cookTime: 30,
-    servings: 8,
-    difficulty: 'easy',
-    cuisine: 'american',
-    dietaryTags: ['dessert', 'vegetarian'],
-    createdAt: new Date(),
-    updatedAt: new Date()
-  }
-]
+import { useAuth } from '../hooks/use-auth'
+import { recipeService } from '../lib/database'
 
 export default function LibraryPage() {
+  const { user, getUserAvatar } = useAuth()
   const [searchQuery, setSearchQuery] = useState('')
-  const [recipes, setRecipes] = useState<Recipe[]>(mockRecipes)
+  const [recipes, setRecipes] = useState<Recipe[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  // TODO: Replace with actual Supabase data fetching
-  // useEffect(() => {
-  //   const fetchRecipes = async () => {
-  //     const { data, error } = await supabase
-  //       .from('saved_recipes')
-  //       .select('*')
-  //       .eq('user_id', user.id)
-  //     if (data) setRecipes(data)
-  //   }
-  //   fetchRecipes()
-  // }, [user])
+  // Fetch user's recipes from database
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      if (!user) {
+        setLoading(false)
+        return
+      }
 
-  const filteredRecipes = recipes.filter(recipe =>
-    recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    recipe.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    recipe.ingredients.some(ingredient => 
-      ingredient.name.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  )
+      try {
+        setLoading(true)
+        setError(null)
+        console.log('Fetching recipes for user:', user.id)
+        const userRecipes = await recipeService.getUserRecipes(user.id)
+        console.log('Fetched recipes:', userRecipes)
+        setRecipes(userRecipes)
+      } catch (err: any) {
+        console.error('Error fetching recipes:', err)
+        if (err.message === 'User not authenticated') {
+          setError('Please log in to view your recipes.')
+        } else {
+          setError('Failed to load recipes. Please try again.')
+        }
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchRecipes()
+  }, [user])
+
+  // Search functionality
+  const handleSearch = async (query: string) => {
+    if (!user) return
+
+    try {
+      setLoading(true)
+      setError(null)
+      
+      if (query.trim()) {
+        const searchResults = await recipeService.searchRecipes(user.id, query)
+        setRecipes(searchResults)
+      } else {
+        // If search is empty, fetch all recipes
+        const allRecipes = await recipeService.getUserRecipes(user.id)
+        setRecipes(allRecipes)
+      }
+    } catch (err) {
+      console.error('Error searching recipes:', err)
+      setError('Failed to search recipes. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Debounced search
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      handleSearch(searchQuery)
+    }, 500)
+
+    return () => clearTimeout(timeoutId)
+  }, [searchQuery, user])
 
   const handleRecipeClick = (recipe: Recipe) => {
     // Navigate to recipe detail page
     window.location.href = `/recipe/${recipe.id}`
   }
 
-  const handleDeleteRecipe = (recipeId: string) => {
-    // TODO: Implement delete functionality with Supabase
-    setRecipes(recipes.filter(recipe => recipe.id !== recipeId))
+  const handleDeleteRecipe = async (recipeId: string) => {
+    if (!user) return
+
+    try {
+      await recipeService.deleteRecipe(recipeId)
+      setRecipes(recipes.filter(recipe => recipe.id !== recipeId))
+    } catch (err) {
+      console.error('Error deleting recipe:', err)
+      alert('Failed to delete recipe. Please try again.')
+    }
+  }
+
+  // Generate a placeholder image URL based on recipe ID
+  const getRecipeImageUrl = (recipeId: string) => {
+    // Use a hash of the recipe ID to get consistent images
+    const hash = recipeId.split('').reduce((a, b) => {
+      a = ((a << 5) - a) + b.charCodeAt(0)
+      return a & a
+    }, 0)
+    const imageIndex = Math.abs(hash) % 6 + 1
+    
+    const imageUrls = [
+      '1563379926898-05f4575a45d8', // Spicy food
+      '1621996346565-e3dbc353d2e5', // Pasta
+      '1546069902-ba9599a7e63c',    // Healthy food
+      '1544025162-0be1a038a1b8',    // Vegetables
+      '1499636136210-6026e6c0e231', // Dessert
+      '1504674900204-0697e668a1c7'  // General cooking
+    ]
+    
+    return `https://images.unsplash.com/photo-${imageUrls[imageIndex - 1]}?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80`
   }
 
   return (
@@ -212,7 +122,12 @@ export default function LibraryPage() {
         {/* Header */}
         <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f3ebe7] px-10 py-3">
           <div className="flex items-center gap-4 text-[#1b120d]">
-            <h2 className="text-[#1b120d] text-lg font-bold leading-tight tracking-[-0.015em]">Pantry Genie</h2>
+            <Link href="/" className="hover:opacity-80 transition-opacity">
+              <h2 className="text-[#1b120d] text-xl font-black leading-tight tracking-[-0.015em]">
+                <span className="text-[#ee6c2b]">Pantry</span>{' '}
+                <span className="text-[#22c55e]">Genie</span>
+              </h2>
+            </Link>
           </div>
           <div className="flex flex-1 justify-end gap-8">
             <div className="flex items-center gap-9">
@@ -222,7 +137,7 @@ export default function LibraryPage() {
             <div
               className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
               style={{
-                backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAV9TKwSwIjOKctAV3h1fx8E-ZDwPRfjMUGEO4a1CQIcJX5NUupRnFE3ANUqopg-E-vYdnjxmwFS2sPVd8uT73u2SYrZ9lz5aM1CakUrW9YVaQLbUc5GpND5IAEbc_SKP3D3WBCheB9NTHkdHZg_-0lBKxkz8n-P-QCxlpOVCWLIIEE23wLdGKZnTOsyZmv1zXYEdbIN-1nkOnnJahS4v4Yb93jLblAzSwTR3pwGVa9uCJNYV1F-IvC0fB5EAE7Kg70EhoywJ7qN00k")'
+                backgroundImage: `url("${getUserAvatar()}")`
               }}
             ></div>
           </div>
@@ -232,8 +147,23 @@ export default function LibraryPage() {
           <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
             {/* Page Title */}
             <div className="flex flex-wrap justify-between gap-3 p-4">
-              <p className="text-[#1b120d] tracking-light text-[32px] font-bold leading-tight min-w-72">My Saved Recipes</p>
+              <p className="text-[#1b120d] tracking-light text-[32px] font-bold leading-tight min-w-72">My Recipes</p>
             </div>
+
+            {/* Error State */}
+            {error && !loading && (
+              <div className="bg-white rounded-lg shadow-lg p-8 text-center">
+                <div className="text-6xl mb-4">❌</div>
+                <h3 className="text-xl font-semibold mb-4 text-[#1b120d]">Failed to load recipes</h3>
+                <p className="text-[#9a664c] mb-6">{error}</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="bg-[#ee6c2b] hover:bg-[#d55a1f] text-white px-6 py-3 rounded-lg transition-colors inline-block"
+                >
+                  Try Again
+                </button>
+              </div>
+            )}
 
             {/* Search Bar */}
             <div className="px-4 py-3">
@@ -255,57 +185,64 @@ export default function LibraryPage() {
                     placeholder="Search recipes"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#1b120d] focus:outline-0 focus:ring-0 border-none bg-[#f3ebe7] focus:border-none h-full placeholder:text-[#9a664c] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
+                    disabled={loading}
+                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#1b120d] focus:outline-0 focus:ring-0 border-none bg-[#f3ebe7] focus:border-none h-full placeholder:text-[#9a664c] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal disabled:opacity-50"
                   />
                 </div>
               </label>
             </div>
 
             {/* Recipes Section */}
-            <h3 className="text-[#1b120d] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">All Recipes</h3>
-            
-            {filteredRecipes.length === 0 ? (
-              <div className="px-4 py-8 text-center">
-                <div className="text-6xl mb-4">📚</div>
-                <h3 className="text-xl font-semibold mb-4 text-[#1b120d]">No recipes found</h3>
-                <p className="text-[#9a664c] mb-6">
-                  {searchQuery ? 'Try adjusting your search terms.' : 'Start by generating some recipes!'}
-                </p>
-                {!searchQuery && (
-                  <Link
-                    href="/generate"
-                    className="bg-[#ee6c2b] hover:bg-[#d55a1f] text-white px-6 py-3 rounded-lg transition-colors inline-block"
-                  >
-                    Generate Your First Recipe
-                  </Link>
-                )}
-              </div>
-            ) : (
-              <div className="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4">
-                {filteredRecipes.map((recipe) => (
-                  <div 
-                    key={recipe.id} 
-                    className="flex flex-col gap-3 pb-3 cursor-pointer hover:opacity-80 transition-opacity"
-                    onClick={() => handleRecipeClick(recipe)}
-                  >
-                    <div
-                      className="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-xl"
-                      style={{
-                        backgroundImage: `url("https://images.unsplash.com/photo-${recipe.id === '1' ? '1563379926898-05f4575a45d8' : 
-                          recipe.id === '2' ? '1621996346565-e3dbc353d2e5' :
-                          recipe.id === '3' ? '1546069902-ba9599a7e63c' :
-                          recipe.id === '4' ? '1544025162-0be1a038a1b8' :
-                          recipe.id === '5' ? '1499636136210-6026e6c0e231' :
-                          '1504674900204-0697e668a1c7'}?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80")`
-                      }}
-                    ></div>
-                    <div>
-                      <p className="text-[#1b120d] text-base font-medium leading-normal">{recipe.title}</p>
-                      <p className="text-[#9a664c] text-sm font-normal leading-normal">{recipe.description}</p>
+            {!error && (
+              <>
+                {loading ? (
+                  <div className="px-4 py-8 text-center">
+                    <div className="animate-pulse">
+                      <div className="text-6xl mb-4 opacity-50">📚</div>
+                      <h3 className="text-xl font-semibold mb-4 text-[#1b120d] opacity-50">Loading recipes...</h3>
                     </div>
                   </div>
-                ))}
-              </div>
+                ) : recipes.length === 0 ? (
+                  <div className="px-4 py-8 text-center">
+                    <div className="text-6xl mb-4">📚</div>
+                    <h3 className="text-xl font-semibold mb-4 text-[#1b120d]">No recipes found</h3>
+                    <p className="text-[#9a664c] mb-6">
+                      {searchQuery ? 'Try adjusting your search terms.' : 'Start by generating some recipes!'}
+                    </p>
+                    {!searchQuery && (
+                      <Link
+                        href="/generate"
+                        className="bg-[#ee6c2b] hover:bg-[#d55a1f] text-white px-6 py-3 rounded-lg transition-colors inline-block"
+                      >
+                        Generate Your First Recipe
+                      </Link>
+                    )}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4">
+                    {recipes.map((recipe) => (
+                      <div 
+                        key={recipe.id} 
+                        className="flex flex-col gap-3 pb-3 cursor-pointer hover:opacity-80 transition-opacity"
+                        onClick={() => handleRecipeClick(recipe)}
+                      >
+                        <div
+                          className="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-xl"
+                          style={{
+                            backgroundImage: recipe.imageUrl 
+                              ? `url("${recipe.imageUrl}")`
+                              : `url("${getRecipeImageUrl(recipe.id)}")`
+                          }}
+                        ></div>
+                        <div>
+                          <p className="text-[#1b120d] text-base font-medium leading-normal">{recipe.title}</p>
+                          <p className="text-[#9a664c] text-sm font-normal leading-normal">{recipe.description}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

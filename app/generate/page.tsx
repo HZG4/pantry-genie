@@ -2,13 +2,16 @@
 
 import { useState, useEffect } from 'react'
 import { RecipeCard } from '../components/recipe-card'
-import { AIService } from '../lib/ai-service'
+import { generateRecipe } from '../lib/ai-service'
 import type { Recipe, RecipeGenerationRequest } from '../types/recipe'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Progress } from '../components/ui/progress'
+import { useAuth } from '../hooks/use-auth'
+import { recipeService } from '../lib/database'
 
 export default function GeneratePage() {
+  const { user, getUserAvatar } = useAuth()
   const [generatedRecipe, setGeneratedRecipe] = useState<Recipe | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -59,8 +62,8 @@ export default function GeneratePage() {
         maxCookTime: cookTime ? parseInt(cookTime) : undefined
       }
 
-      const response = await AIService.generateRecipe(request)
-      setGeneratedRecipe(response.recipe)
+      const recipe = await generateRecipe(request)
+      setGeneratedRecipe(recipe)
     } catch (err) {
       setError('Failed to generate recipe. Please try again.')
       console.error('Recipe generation error:', err)
@@ -77,9 +80,16 @@ export default function GeneratePage() {
     alert('Edit functionality coming soon!')
   }
 
-  const handleSaveRecipe = () => {
-    // TODO: Implement save functionality with Supabase
-    alert('Save functionality will be implemented with user authentication!')
+  const handleSaveRecipe = async () => {
+    if (!user || !generatedRecipe) return
+
+    try {
+      await recipeService.saveRecipe(generatedRecipe, user.id)
+      alert('Recipe saved successfully!')
+    } catch (err) {
+      console.error('Error saving recipe:', err)
+      alert('Failed to save recipe. Please try again.')
+    }
   }
 
   const handleGenerateNew = () => {
@@ -99,7 +109,12 @@ export default function GeneratePage() {
         {/* Header */}
         <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f3ebe7] px-10 py-3">
           <div className="flex items-center gap-4 text-[#1b120d]">
-            <h2 className="text-[#1b120d] text-lg font-bold leading-tight tracking-[-0.015em]">Pantry Genie</h2>
+            <Link href="/" className="hover:opacity-80 transition-opacity">
+              <h2 className="text-[#1b120d] text-xl font-black leading-tight tracking-[-0.015em]">
+                <span className="text-[#ee6c2b]">Pantry</span>{' '}
+                <span className="text-[#22c55e]">Genie</span>
+              </h2>
+            </Link>
           </div>
           <div className="flex flex-1 justify-end gap-8">
             <div className="flex items-center gap-9">
@@ -109,7 +124,7 @@ export default function GeneratePage() {
             <div
               className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
               style={{
-                backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAV9TKwSwIjOKctAV3h1fx8E-ZDwPRfjMUGEO4a1CQIcJX5NUupRnFE3ANUqopg-E-vYdnjxmwFS2sPVd8uT73u2SYrZ9lz5aM1CakUrW9YVaQLbUc5GpND5IAEbc_SKP3D3WBCheB9NTHkdHZg_-0lBKxkz8n-P-QCxlpOVCWLIIEE23wLdGKZnTOsyZmv1zXYEdbIN-1nkOnnJahS4v4Yb93jLblAzSwTR3pwGVa9uCJNYV1F-IvC0fB5EAE7Kg70EhoywJ7qN00k")'
+                backgroundImage: `url("${getUserAvatar()}")`
               }}
             ></div>
           </div>
@@ -256,7 +271,9 @@ export default function GeneratePage() {
                     <div
                       className="w-full bg-center bg-no-repeat bg-cover aspect-auto rounded-none flex-1"
                       style={{
-                        backgroundImage: `url("https://images.unsplash.com/photo-1563379926898-05f4575a45d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80")`
+                        backgroundImage: generatedRecipe.imageUrl 
+                          ? `url("${generatedRecipe.imageUrl}")`
+                          : `url("https://images.unsplash.com/photo-1563379926898-05f4575a45d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80")`
                       }}
                     ></div>
                   </div>
