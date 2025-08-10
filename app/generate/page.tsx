@@ -139,22 +139,22 @@ export default function GeneratePage() {
     >
       <div className="layout-container flex h-full grow flex-col">
         {/* Header */}
-        <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f3ebe7] px-10 py-3">
+        <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f3ebe7] px-4 sm:px-6 md:px-8 lg:px-10 py-3">
           <div className="flex items-center gap-4 text-[#1b120d]">
             <Link href="/" className="hover:opacity-80 transition-opacity">
-              <h2 className="text-[#1b120d] text-xl font-black leading-tight tracking-[-0.015em]">
+              <h2 className="text-[#1b120d] text-lg sm:text-xl font-black leading-tight tracking-[-0.015em]">
                 <span className="text-[#ee6c2b]">Pantry</span>{' '}
                 <span className="text-[#22c55e]">Genie</span>
               </h2>
             </Link>
           </div>
-          <div className="flex flex-1 justify-end gap-8">
-            <div className="flex items-center gap-9">
+          <div className="flex flex-1 justify-end gap-4 sm:gap-6 md:gap-8">
+            <div className="hidden sm:flex items-center gap-6 md:gap-9">
               <Link className="text-[#1b120d] text-sm font-medium leading-normal" href="/">Home</Link>
               <Link className="text-[#1b120d] text-sm font-medium leading-normal" href="/library">My Recipes</Link>
             </div>
             <div
-              className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
+              className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-8 sm:size-10"
               style={{
                 backgroundImage: `url("${getUserAvatar()}")`
               }}
@@ -162,15 +162,15 @@ export default function GeneratePage() {
           </div>
         </header>
 
-        <div className="px-40 flex flex-1 justify-center py-5">
+        <div className="px-4 sm:px-6 md:px-8 lg:px-20 xl:px-40 flex flex-1 justify-center py-5">
           <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
             {/* Show Form */}
             {showForm && (
               <>
-                <div className="flex flex-wrap justify-between gap-3 p-4">
-                  <div className="flex min-w-72 flex-col gap-3">
-                    <p className="text-[#1b120d] tracking-light text-[32px] font-bold leading-tight">Generate Your Recipe</p>
-                    <p className="text-[#9a664c] text-sm font-normal leading-normal">Enter the ingredients you have, and let AI create a unique recipe for you.</p>
+                <div className="flex flex-col sm:flex-row sm:flex-wrap justify-between gap-3 p-2 sm:p-4">
+                  <div className="flex min-w-0 sm:min-w-72 flex-col gap-3">
+                    <p className="text-[#1b120d] tracking-light text-xl sm:text-2xl md:text-[32px] font-bold leading-tight">Generate Your Recipe</p>
+                    <p className="text-[#9a664c] text-xs sm:text-sm font-normal leading-normal">Enter the ingredients you have, and let AI create a unique recipe for you.</p>
                   </div>
                   <button
                     onClick={handleGenerateRecipe}
@@ -181,23 +181,23 @@ export default function GeneratePage() {
                   </button>
                 </div>
 
-                <div className="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
-                  <label className="flex flex-col min-w-40 flex-1">
+                <div className="flex max-w-[480px] flex-wrap items-end gap-3 sm:gap-4 px-2 sm:px-4 py-3">
+                  <label className="flex flex-col min-w-0 sm:min-w-40 flex-1">
                     <textarea
                       placeholder="List your ingredients here..."
                       value={ingredients}
                       onChange={(e) => setIngredients(e.target.value)}
-                      className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#1b120d] focus:outline-0 focus:ring-0 border border-[#e7d7cf] bg-[#fcf9f8] focus:border-[#e7d7cf] min-h-36 placeholder:text-[#9a664c] p-[15px] text-base font-normal leading-normal"
+                      className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#1b120d] focus:outline-0 focus:ring-0 border border-[#e7d7cf] bg-[#fcf9f8] focus:border-[#e7d7cf] min-h-32 sm:min-h-36 placeholder:text-[#9a664c] p-3 sm:p-[15px] text-sm sm:text-base font-normal leading-normal"
                     ></textarea>
                   </label>
                 </div>
 
-                <div className="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
-                  <label className="flex flex-col min-w-40 flex-1">
+                <div className="flex max-w-[480px] flex-wrap items-end gap-3 sm:gap-4 px-2 sm:px-4 py-3">
+                  <label className="flex flex-col min-w-0 sm:min-w-40 flex-1">
                     <select
                       value={dietaryConstraints}
                       onChange={(e) => setDietaryConstraints(e.target.value)}
-                      className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#1b120d] focus:outline-0 focus:ring-0 border border-[#e7d7cf] bg-[#fcf9f8] focus:border-[#e7d7cf] h-14 bg-[image:--select-button-svg] placeholder:text-[#9a664c] p-[15px] text-base font-normal leading-normal"
+                      className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#1b120d] focus:outline-0 focus:ring-0 border border-[#e7d7cf] bg-[#fcf9f8] focus:border-[#e7d7cf] h-12 sm:h-14 bg-[image:--select-button-svg] placeholder:text-[#9a664c] p-3 sm:p-[15px] text-sm sm:text-base font-normal leading-normal"
                     >
                       <option value="">Dietary Constraints (Optional)</option>
                       <option value="vegetarian">Vegetarian</option>
@@ -210,12 +210,12 @@ export default function GeneratePage() {
                   </label>
                 </div>
 
-                <div className="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
-                  <label className="flex flex-col min-w-40 flex-1">
+                <div className="flex max-w-[480px] flex-wrap items-end gap-3 sm:gap-4 px-2 sm:px-4 py-3">
+                  <label className="flex flex-col min-w-0 sm:min-w-40 flex-1">
                     <select
                       value={cuisinePreference}
                       onChange={(e) => setCuisinePreference(e.target.value)}
-                      className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#1b120d] focus:outline-0 focus:ring-0 border border-[#e7d7cf] bg-[#fcf9f8] focus:border-[#e7d7cf] h-14 bg-[image:--select-button-svg] placeholder:text-[#9a664c] p-[15px] text-base font-normal leading-normal"
+                      className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#1b120d] focus:outline-0 focus:ring-0 border border-[#e7d7cf] bg-[#fcf9f8] focus:border-[#e7d7cf] h-12 sm:h-14 bg-[image:--select-button-svg] placeholder:text-[#9a664c] p-3 sm:p-[15px] text-sm sm:text-base font-normal leading-normal"
                     >
                       <option value="">Cuisine Preference (Optional)</option>
                       <option value="italian">Italian</option>
@@ -232,8 +232,8 @@ export default function GeneratePage() {
                   </label>
                 </div>
 
-                <div className="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
-                  <label className="flex flex-col min-w-40 flex-1">
+                <div className="flex max-w-[480px] flex-wrap items-end gap-3 sm:gap-4 px-2 sm:px-4 py-3">
+                  <label className="flex flex-col min-w-0 sm:min-w-40 flex-1">
                     <input
                       placeholder="Number of Servings (Optional)"
                       value={servings}
@@ -241,27 +241,24 @@ export default function GeneratePage() {
                       type="number"
                       min="1"
                       max="12"
-                      className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#1b120d] focus:outline-0 focus:ring-0 border border-[#e7d7cf] bg-[#fcf9f8] focus:border-[#e7d7cf] h-14 placeholder:text-[#9a664c] p-[15px] text-base font-normal leading-normal"
+                      className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#1b120d] focus:outline-0 focus:ring-0 border border-[#e7d7cf] bg-[#fcf9f8] focus:border-[#e7d7cf] h-12 sm:h-14 placeholder:text-[#9a664c] p-3 sm:p-[15px] text-sm sm:text-base font-normal leading-normal"
                     />
                   </label>
                 </div>
 
-                <div className="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
-                  <label className="flex flex-col min-w-40 flex-1">
+                <div className="flex max-w-[480px] flex-wrap items-end gap-3 sm:gap-4 px-2 sm:px-4 py-3">
+                  <label className="flex flex-col min-w-0 sm:min-w-40 flex-1">
                     <input
-                      placeholder="Cook Time (Optional)"
+                      placeholder="Max Cook Time in Minutes (Optional)"
                       value={cookTime}
                       onChange={(e) => setCookTime(e.target.value)}
                       type="number"
                       min="15"
                       max="180"
-                      step="15"
-                      className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#1b120d] focus:outline-0 focus:ring-0 border border-[#e7d7cf] bg-[#fcf9f8] focus:border-[#e7d7cf] h-14 placeholder:text-[#9a664c] p-[15px] text-base font-normal leading-normal"
+                      className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#1b120d] focus:outline-0 focus:ring-0 border border-[#e7d7cf] bg-[#fcf9f8] focus:border-[#e7d7cf] h-12 sm:h-14 placeholder:text-[#9a664c] p-3 sm:p-[15px] text-sm sm:text-base font-normal leading-normal"
                     />
                   </label>
                 </div>
-
-
               </>
             )}
 
@@ -290,14 +287,16 @@ export default function GeneratePage() {
             )}
 
             {/* Show Generated Recipe */}
-            {generatedRecipe && !isGenerating && (
-              <div>
-                {/* Recipe Header with Title, Description, and Action Buttons */}
-                <div className="flex flex-col lg:flex-row lg:items-start gap-6 p-4">
+            {generatedRecipe && !showForm && (
+              <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 lg:p-8">
+                {/* Recipe Header */}
+                <div className="flex flex-col lg:flex-row gap-4 lg:gap-8 mb-6 lg:mb-8">
                   <div className="flex-1">
-                    <h1 className="text-[#1b120d] tracking-light text-[32px] font-bold leading-tight mb-3">AI-Generated Recipe: {generatedRecipe.title}</h1>
+                    <h2 className="text-[#1b120d] text-xl sm:text-2xl lg:text-3xl font-bold leading-tight tracking-[-0.015em] mb-2 sm:mb-3">
+                      {generatedRecipe.title}
+                    </h2>
                     {generatedRecipe.description && (
-                      <p className="text-[#9a664c] text-lg leading-relaxed mb-4">{generatedRecipe.description}</p>
+                      <p className="text-[#9a664c] text-sm sm:text-base lg:text-lg leading-relaxed mb-3 sm:mb-4">{generatedRecipe.description}</p>
                     )}
                   </div>
                   
@@ -343,7 +342,7 @@ export default function GeneratePage() {
                 </div>
                 
                 {/* Recipe Image */}
-                <div className="flex w-full grow bg-[#fcf9f8] @container p-4">
+                <div className="flex w-full grow bg-[#fcf9f8] @container p-2 sm:p-4 mb-4 lg:mb-6">
                   <div className="w-full gap-1 overflow-hidden bg-[#fcf9f8] @[480px]:gap-2 aspect-[3/2] rounded-xl flex">
                     <div
                       className="w-full bg-center bg-no-repeat bg-cover aspect-auto rounded-none flex-1"
@@ -357,44 +356,44 @@ export default function GeneratePage() {
                 </div>
 
                 {/* Recipe Metrics */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 p-4 bg-[#f3ebe7] rounded-lg mx-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8 p-3 sm:p-4 bg-[#f3ebe7] rounded-lg mx-2 sm:mx-4">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-[#ee6c2b]">
+                    <div className="text-xl sm:text-2xl font-bold text-[#ee6c2b]">
                       {generatedRecipe.prepTime || 15}
                     </div>
-                    <div className="text-sm text-[#9a664c]">Prep Time (min)</div>
+                    <div className="text-xs sm:text-sm text-[#9a664c]">Prep Time (min)</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-[#ee6c2b]">
+                    <div className="text-xl sm:text-2xl font-bold text-[#ee6c2b]">
                       {generatedRecipe.cookTime || 30}
                     </div>
-                    <div className="text-sm text-[#9a664c]">Cook Time (min)</div>
+                    <div className="text-xs sm:text-sm text-[#9a664c]">Cook Time (min)</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-[#ee6c2b]">
+                    <div className="text-xl sm:text-2xl font-bold text-[#ee6c2b]">
                       {generatedRecipe.servings || 4}
                     </div>
-                    <div className="text-sm text-[#9a664c]">Servings</div>
+                    <div className="text-xs sm:text-sm text-[#9a664c]">Servings</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-[#ee6c2b] capitalize">
+                    <div className="text-xl sm:text-2xl font-bold text-[#ee6c2b] capitalize">
                       {generatedRecipe.difficulty || 'medium'}
                     </div>
-                    <div className="text-sm text-[#9a664c]">Difficulty</div>
+                    <div className="text-xs sm:text-sm text-[#9a664c]">Difficulty</div>
                   </div>
                 </div>
 
                 {/* Ingredients */}
-                <h3 className="text-[#1b120d] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Ingredients</h3>
-                <ul className="text-[#1b120d] text-base font-normal leading-normal pb-3 pt-1 px-4 space-y-1">
+                <h3 className="text-[#1b120d] text-base sm:text-lg font-bold leading-tight tracking-[-0.015em] px-2 sm:px-4 pb-2 pt-2 sm:pt-4">Ingredients</h3>
+                <ul className="text-[#1b120d] text-sm sm:text-base font-normal leading-normal pb-3 pt-1 px-2 sm:px-4 space-y-1">
                   {generatedRecipe.ingredients.map((ingredient, index) => (
                     <li key={index}>• {ingredient.amount} {ingredient.unit} {ingredient.name}</li>
                   ))}
                 </ul>
 
                 {/* Instructions */}
-                <h3 className="text-[#1b120d] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Instructions</h3>
-                <ol className="text-[#1b120d] text-base font-normal leading-normal pb-3 pt-1 px-4 space-y-2">
+                <h3 className="text-[#1b120d] text-base sm:text-lg font-bold leading-tight tracking-[-0.015em] px-2 sm:px-4 pb-2 pt-2 sm:pt-4">Instructions</h3>
+                <ol className="text-[#1b120d] text-sm sm:text-base font-normal leading-normal pb-3 pt-1 px-2 sm:px-4 space-y-2">
                   {generatedRecipe.instructions.map((instruction, index) => (
                     <li key={index}>{index + 1}. {instruction}</li>
                   ))}
@@ -404,13 +403,13 @@ export default function GeneratePage() {
 
             {/* Show Error State */}
             {error && !isGenerating && !showForm && (
-              <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-                <div className="text-6xl mb-4">❌</div>
-                <h3 className="text-xl font-semibold mb-4 text-[#1b120d]">Oops! Something went wrong</h3>
-                <p className="text-[#9a664c] mb-6">{error}</p>
+              <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 lg:p-8 text-center">
+                <div className="text-4xl sm:text-6xl mb-3 sm:mb-4">❌</div>
+                <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-[#1b120d]">Oops! Something went wrong</h3>
+                <p className="text-[#9a664c] mb-4 sm:mb-6 text-sm sm:text-base">{error}</p>
                 <button
                   onClick={handleGenerateNew}
-                  className="bg-[#ee6c2b] hover:bg-[#d55a1f] text-white px-6 py-3 rounded-lg transition-colors"
+                  className="bg-[#ee6c2b] hover:bg-[#d55a1f] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition-colors text-sm sm:text-base"
                 >
                   Try Again
                 </button>

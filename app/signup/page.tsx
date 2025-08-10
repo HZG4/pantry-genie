@@ -167,14 +167,14 @@ export default function SignupPage() {
       } as React.CSSProperties}
     >
       <div className="layout-container flex h-full grow flex-col">
-        <div className="px-40 flex flex-1 justify-center">
-          <div className="layout-content-container flex flex-col w-[512px] max-w-[512px] py-5 max-w-[960px] flex-1">
-            <div className="bg-white rounded-2xl shadow-lg p-6 mx-auto max-w-[450px]">
-              <h2 className="text-[#1b120d] tracking-light text-[28px] font-bold leading-tight px-4 text-center pb-3 pt-5">
+        <div className="px-4 sm:px-6 md:px-8 lg:px-20 xl:px-40 flex flex-1 justify-center">
+          <div className="layout-content-container flex flex-col w-full sm:w-[512px] max-w-[512px] py-5 max-w-[960px] flex-1">
+            <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 mx-auto max-w-[450px] w-full">
+              <h2 className="text-[#1b120d] tracking-light text-xl sm:text-2xl md:text-[28px] font-bold leading-tight px-2 sm:px-4 text-center pb-3 pt-3 sm:pt-5">
                 Create your account
               </h2>
               
-              <div className="flex flex-col items-center gap-4 px-4 py-3">
+              <div className="flex flex-col items-center gap-3 sm:gap-4 px-2 sm:px-4 py-3">
                 <InputField
                   label="Name"
                   placeholder="Enter your name"
@@ -185,7 +185,7 @@ export default function SignupPage() {
                 />
               </div>
 
-              <div className="flex flex-col items-center gap-4 px-4 py-3">
+              <div className="flex flex-col items-center gap-3 sm:gap-4 px-2 sm:px-4 py-3">
                 <InputField
                   label="Email"
                   placeholder="Enter your email"
@@ -197,7 +197,7 @@ export default function SignupPage() {
                 />
               </div>
 
-              <div className="flex flex-col items-center gap-4 px-4 py-3">
+              <div className="flex flex-col items-center gap-3 sm:gap-4 px-2 sm:px-4 py-3">
                 <InputField
                   label="Password"
                   placeholder="Enter your password"
@@ -209,7 +209,7 @@ export default function SignupPage() {
                 />
               </div>
 
-              <div className="flex flex-col items-center gap-4 px-4 py-3">
+              <div className="flex flex-col items-center gap-3 sm:gap-4 px-2 sm:px-4 py-3">
                 <InputField
                   label="Confirm Password"
                   placeholder="Confirm your password"
@@ -223,10 +223,10 @@ export default function SignupPage() {
 
               {/* Progress Bar */}
               {isLoading && (
-                <div className="flex flex-col items-center gap-2 px-4 py-2">
+                <div className="flex flex-col items-center gap-2 px-2 sm:px-4 py-2">
                   <Progress 
                     value={progress} 
-                    className="w-96 h-2 bg-[#f3ebe7]"
+                    className="w-full sm:w-96 h-2 bg-[#f3ebe7]"
                   />
                   <p className="text-[#9a664c] text-sm">
                     Creating your account... {progress}%
@@ -234,18 +234,18 @@ export default function SignupPage() {
                 </div>
               )}
 
-              <div className="flex flex-col items-center gap-4 px-4 py-3">
+              <div className="flex flex-col items-center gap-3 sm:gap-4 px-2 sm:px-4 py-3">
                 <button
                   onClick={handleSignUp}
                   disabled={isLoading}
-                  className="flex w-96 max-w-[600px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#ee6c2b] text-[#fcf9f8] text-sm font-bold leading-normal tracking-[0.015em] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#d55a1f] transition-colors"
+                  className="flex w-full sm:w-96 max-w-[600px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#ee6c2b] text-[#fcf9f8] text-sm font-bold leading-normal tracking-[0.015em] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#d55a1f] transition-colors"
                 >
                   <span className="truncate">
                     {isLoading ? 'Creating Account...' : 'Sign Up'}
                   </span>
                 </button>
                 
-                <div className="flex items-center w-96 max-w-[600px]">
+                <div className="flex items-center w-full sm:w-96 max-w-[600px]">
                   <div className="flex-1 h-px bg-[#e7d7cf]"></div>
                   <span className="px-4 text-[#9a664c] text-sm">or</span>
                   <div className="flex-1 h-px bg-[#e7d7cf]"></div>
@@ -268,7 +268,7 @@ export default function SignupPage() {
                     })
                   }}
                   disabled={isLoading}
-                  className="flex w-96 max-w-[600px] cursor-pointer items-center justify-center gap-3 overflow-hidden rounded-xl h-10 px-4 bg-white text-[#1b120d] text-sm font-medium leading-normal tracking-[0.015em] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors border border-[#e7d7cf]"
+                  className="flex w-full sm:w-96 max-w-[600px] cursor-pointer items-center justify-center gap-3 overflow-hidden rounded-xl h-10 px-4 bg-white text-[#1b120d] text-sm font-medium leading-normal tracking-[0.015em] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors border border-[#e7d7cf]"
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -280,7 +280,7 @@ export default function SignupPage() {
                 </button>
               </div>
 
-              <p className="text-[#9a664c] text-sm font-normal leading-normal pb-3 pt-1 px-4 text-center">
+              <p className="text-[#9a664c] text-sm font-normal leading-normal pb-3 pt-1 px-2 sm:px-4 text-center">
                 Already have an account?{' '}
                 <Link href="/login" className="text-[#ee6c2b] hover:underline">
                   Log In
