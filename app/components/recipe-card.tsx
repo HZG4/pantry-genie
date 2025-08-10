@@ -17,14 +17,7 @@ export function RecipeCard({ recipe, onSave, onEdit, isSaved = false }: RecipeCa
     return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`
   }
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'easy': return 'text-green-600 bg-green-100'
-      case 'medium': return 'text-yellow-600 bg-yellow-100'
-      case 'hard': return 'text-red-600 bg-red-100'
-      default: return 'text-gray-600 bg-gray-100'
-    }
-  }
+
 
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">

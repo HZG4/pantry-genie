@@ -1,4 +1,4 @@
-import type { Recipe, RecipeGenerationRequest } from '../types/recipe'
+import type { Recipe, RecipeGenerationRequest, RecipeIngredient } from '../types/recipe'
 
 // Google Gemini API configuration
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
@@ -110,12 +110,7 @@ export async function generateRecipe(request: RecipeGenerationRequest): Promise<
   return generateRecipeFromTemplate(request)
 }
 
-// Helper function to determine difficulty based on cooking time
-function getDifficulty(cookingTime: number): 'easy' | 'medium' | 'hard' {
-  if (cookingTime <= 20) return 'easy'
-  if (cookingTime <= 45) return 'medium'
-  return 'hard'
-}
+
 
 // Generate recipe using Google Gemini AI
 async function generateRecipeWithAI(request: RecipeGenerationRequest): Promise<Recipe | null> {
@@ -219,7 +214,7 @@ function parseAIResponse(text: string, request: RecipeGenerationRequest): Recipe
   
   let title = 'AI Generated Recipe'
   let description = 'A delicious recipe created just for you!'
-  let ingredients: any[] = []
+  let ingredients: RecipeIngredient[] = []
   let instructions: string[] = []
   let prepTime = 15
   let cookTime = 30

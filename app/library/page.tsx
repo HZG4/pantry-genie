@@ -1,15 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import type { Recipe } from '../types/recipe'
 import { useAuth } from '../hooks/use-auth'
 import { recipeService } from '../lib/database'
-import { useToast } from '../components/ui/toast'
+
 
 export default function LibraryPage() {
   const { user, getUserAvatar } = useAuth()
-  const { showToast } = useToast()
   const [searchQuery, setSearchQuery] = useState('')
   const [recipes, setRecipes] = useState<Recipe[]>([])
   const [loading, setLoading] = useState(true)
@@ -30,9 +29,10 @@ export default function LibraryPage() {
         const userRecipes = await recipeService.getUserRecipes(user.id)
         console.log('Fetched recipes:', userRecipes)
         setRecipes(userRecipes)
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Error fetching recipes:', err)
-        if (err.message === 'User not authenticated') {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error'
+        if (errorMessage === 'User not authenticated') {
           setError('Please log in to view your recipes.')
         } else {
           setError('Failed to load recipes. Please try again.')
@@ -46,7 +46,7 @@ export default function LibraryPage() {
   }, [user])
 
   // Search functionality
-  const handleSearch = async (query: string) => {
+  const handleSearch = useCallback(async (query: string) => {
     if (!user) return
 
     try {
@@ -67,7 +67,7 @@ export default function LibraryPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user])
 
   // Debounced search
   useEffect(() => {
@@ -76,35 +76,14 @@ export default function LibraryPage() {
     }, 500)
 
     return () => clearTimeout(timeoutId)
-  }, [searchQuery, user])
+  }, [searchQuery, user, handleSearch])
 
   const handleRecipeClick = (recipe: Recipe) => {
     // Navigate to recipe detail page
     window.location.href = `/recipe/${recipe.id}`
   }
 
-  const handleDeleteRecipe = async (recipeId: string) => {
-    if (!user) return
 
-    try {
-      await recipeService.deleteRecipe(recipeId)
-      setRecipes(recipes.filter(recipe => recipe.id !== recipeId))
-      showToast({
-        type: 'success',
-        title: 'Recipe Deleted',
-        message: 'Recipe has been removed from your library.',
-        duration: 3000
-      })
-    } catch (err) {
-      console.error('Error deleting recipe:', err)
-      showToast({
-        type: 'error',
-        title: 'Delete Failed',
-        message: 'Failed to delete recipe. Please try again.',
-        duration: 5000
-      })
-    }
-  }
 
   // Generate a placeholder image URL based on recipe ID
   const getRecipeImageUrl = (recipeId: string) => {

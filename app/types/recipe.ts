@@ -76,7 +76,7 @@ export interface UserProfile {
   id: string
   name?: string
   avatar_url?: string
-  preferences?: Record<string, any>
+  preferences?: Record<string, unknown>
   created_at: string
   updated_at: string
 }

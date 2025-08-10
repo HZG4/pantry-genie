@@ -125,9 +125,10 @@ export default function SignupPage() {
       })
       router.push('/login')
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Signup error:', error)
-      if (error.message?.includes('email')) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      if (errorMessage?.includes('email')) {
         setErrors({ email: 'This email is already registered. Please try logging in instead.' })
         showToast({
           type: 'error',

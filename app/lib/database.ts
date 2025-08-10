@@ -1,5 +1,5 @@
 import { supabase } from './supabase'
-import type { Recipe, DatabaseRecipe, UserProfile } from '../types/recipe'
+import type { Recipe, DatabaseRecipe, UserProfile, RecipeIngredient } from '../types/recipe'
 
 // Convert database recipe to app recipe
 function convertDatabaseRecipe(dbRecipe: DatabaseRecipe): Recipe {
@@ -34,7 +34,7 @@ function convertToDatabaseRecipe(recipe: Recipe, userId: string): Omit<DatabaseR
     cook_time: recipe.cookTime,
     servings: recipe.servings,
     difficulty: recipe.difficulty,
-    cuisine: recipe.cuisine,
+    cuisine: recipe.cuisine || 'General',
     dietary_tags: recipe.dietaryTags,
     image_url: recipe.imageUrl
   }
@@ -160,11 +160,11 @@ export const recipeService = {
   },
 
   // Helper method to check if two ingredient lists are similar
-  areIngredientsSimilar(ingredients1: any[], ingredients2: any[]): boolean {
+  areIngredientsSimilar(ingredients1: RecipeIngredient[], ingredients2: RecipeIngredient[]): boolean {
     if (!ingredients1 || !ingredients2) return false
     
     // Normalize ingredient names for comparison
-    const normalizeIngredient = (ingredient: any) => 
+    const normalizeIngredient = (ingredient: RecipeIngredient) => 
       ingredient.name?.toLowerCase().trim().replace(/[^\w\s]/g, '') || ''
     
     const names1 = ingredients1.map(normalizeIngredient).sort()
@@ -214,7 +214,7 @@ export const recipeService = {
   // Update an existing recipe
   async updateRecipe(recipeId: string, recipe: Partial<Recipe>): Promise<Recipe> {
     try {
-      const updateData: any = {}
+      const updateData: Partial<DatabaseRecipe> = {}
       
       if (recipe.title !== undefined) updateData.title = recipe.title
       if (recipe.description !== undefined) updateData.description = recipe.description
