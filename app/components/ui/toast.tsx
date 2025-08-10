@@ -120,6 +120,11 @@ const ToastContext = React.createContext<ToastContextType | undefined>(undefined
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([])
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   const showToast = (toast: Omit<Toast, 'id'>) => {
     const id = Math.random().toString(36).substr(2, 9)
@@ -134,7 +139,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={{ showToast, removeToast }}>
       {children}
-      {typeof window !== 'undefined' && createPortal(
+      {isMounted && createPortal(
         <div className="fixed top-0 right-0 z-50 p-4 space-y-4">
           {toasts.map(toast => (
             <ToastComponent

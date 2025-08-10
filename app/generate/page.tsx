@@ -1,11 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { RecipeCard } from '../components/recipe-card'
 import { generateRecipe } from '../lib/ai-service'
 import type { Recipe, RecipeGenerationRequest } from '../types/recipe'
 import Link from 'next/link'
-import Image from 'next/image'
 import { Progress } from '../components/ui/progress'
 import { useAuth } from '../hooks/use-auth'
 import { recipeService } from '../lib/database'
@@ -77,27 +75,42 @@ export default function GeneratePage() {
 
 
 
-  const handleEditRecipe = () => {
-    // TODO: Implement edit functionality
-    showToast({
-      type: 'info',
-      title: 'Coming Soon!',
-      message: 'Edit functionality will be available in the next update.',
-      duration: 3000
-    })
-  }
+
+
+  const [isSaving, setIsSaving] = useState(false)
 
   const handleSaveRecipe = async () => {
-    if (!user || !generatedRecipe) return
+    if (!user || !generatedRecipe || isSaving) return
+
+    setIsSaving(true)
 
     try {
+      // Check if recipe already exists
+      const recipeExists = await recipeService.checkRecipeExists(generatedRecipe, user.id)
+      
+      if (recipeExists) {
+        showToast({
+          type: 'info',
+          title: 'Recipe Already Saved',
+          message: 'This recipe is already in your library.',
+          duration: 3000
+        })
+        return
+      }
+
+      // Save the recipe
       await recipeService.saveRecipe(generatedRecipe, user.id)
+      
       showToast({
         type: 'success',
         title: 'Recipe Saved!',
-        message: 'Your recipe has been added to your library.',
-        duration: 4000
+        message: 'Your recipe has been added to your library. Redirecting to your library...',
+        duration: 2000
       })
+
+      // Redirect to library page immediately
+      window.location.href = '/library'
+      
     } catch (err) {
       console.error('Error saving recipe:', err)
       showToast({
@@ -106,6 +119,8 @@ export default function GeneratePage() {
         message: 'Failed to save recipe. Please try again.',
         duration: 5000
       })
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -157,6 +172,13 @@ export default function GeneratePage() {
                     <p className="text-[#1b120d] tracking-light text-[32px] font-bold leading-tight">Generate Your Recipe</p>
                     <p className="text-[#9a664c] text-sm font-normal leading-normal">Enter the ingredients you have, and let AI create a unique recipe for you.</p>
                   </div>
+                  <button
+                    onClick={handleGenerateRecipe}
+                    disabled={!ingredients.trim()}
+                    className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#ee6c2b] text-[#fcf9f8] text-sm font-bold leading-normal tracking-[0.015em] disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <span className="truncate">Generate Recipe</span>
+                  </button>
                 </div>
 
                 <div className="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
@@ -239,15 +261,7 @@ export default function GeneratePage() {
                   </label>
                 </div>
 
-                <div className="flex px-4 py-3 justify-end">
-                  <button
-                    onClick={handleGenerateRecipe}
-                    disabled={!ingredients.trim()}
-                    className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#ee6c2b] text-[#fcf9f8] text-sm font-bold leading-normal tracking-[0.015em] disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <span className="truncate">Generate Recipe</span>
-                  </button>
-                </div>
+
               </>
             )}
 
@@ -278,8 +292,54 @@ export default function GeneratePage() {
             {/* Show Generated Recipe */}
             {generatedRecipe && !isGenerating && (
               <div>
-                <div className="flex flex-wrap justify-between gap-3 p-4">
-                  <p className="text-[#1b120d] tracking-light text-[32px] font-bold leading-tight min-w-72">AI-Generated Recipe: {generatedRecipe.title}</p>
+                {/* Recipe Header with Title, Description, and Action Buttons */}
+                <div className="flex flex-col lg:flex-row lg:items-start gap-6 p-4">
+                  <div className="flex-1">
+                    <h1 className="text-[#1b120d] tracking-light text-[32px] font-bold leading-tight mb-3">AI-Generated Recipe: {generatedRecipe.title}</h1>
+                    {generatedRecipe.description && (
+                      <p className="text-[#9a664c] text-lg leading-relaxed mb-4">{generatedRecipe.description}</p>
+                    )}
+                  </div>
+                  
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap gap-3 lg:flex-col lg:min-w-[200px]">
+                    <button
+                      onClick={handleSaveRecipe}
+                      disabled={isSaving}
+                      className={`flex min-w-[84px] max-w-[480px] lg:max-w-none items-center justify-center overflow-hidden rounded-xl h-10 px-4 text-[#fcf9f8] text-sm font-bold leading-normal tracking-[0.015em] ${
+                        isSaving 
+                          ? 'bg-[#9a664c] cursor-not-allowed opacity-60' 
+                          : 'bg-[#ee6c2b] cursor-pointer hover:bg-[#d55a1f]'
+                      }`}
+                    >
+                      <span className="truncate flex items-center gap-2">
+                        {isSaving && (
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        )}
+                        {isSaving ? 'Saving...' : 'Save Recipe'}
+                      </span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        // TODO: Implement share functionality
+                        showToast({
+                          type: 'info',
+                          title: 'Coming Soon!',
+                          message: 'Share functionality will be available in the next update.',
+                          duration: 3000
+                        })
+                      }}
+                      className="flex min-w-[84px] max-w-[480px] lg:max-w-none cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#f3ebe7] text-[#1b120d] text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#e7d7cf] transition-colors"
+                    >
+                      <span className="truncate">Share</span>
+                    </button>
+                    <button
+                      onClick={handleGenerateNew}
+                      className="flex min-w-[84px] max-w-[480px] lg:max-w-none cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#f3ebe7] text-[#1b120d] text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#e7d7cf] transition-colors"
+                    >
+                      <span className="truncate">Generate New Recipe</span>
+                    </button>
+                  </div>
                 </div>
                 
                 {/* Recipe Image */}
@@ -293,6 +353,34 @@ export default function GeneratePage() {
                           : `url("https://images.unsplash.com/photo-1563379926898-05f4575a45d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80")`
                       }}
                     ></div>
+                  </div>
+                </div>
+
+                {/* Recipe Metrics */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 p-4 bg-[#f3ebe7] rounded-lg mx-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-[#ee6c2b]">
+                      {generatedRecipe.prepTime || 15}
+                    </div>
+                    <div className="text-sm text-[#9a664c]">Prep Time (min)</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-[#ee6c2b]">
+                      {generatedRecipe.cookTime || 30}
+                    </div>
+                    <div className="text-sm text-[#9a664c]">Cook Time (min)</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-[#ee6c2b]">
+                      {generatedRecipe.servings || 4}
+                    </div>
+                    <div className="text-sm text-[#9a664c]">Servings</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-[#ee6c2b] capitalize">
+                      {generatedRecipe.difficulty || 'medium'}
+                    </div>
+                    <div className="text-sm text-[#9a664c]">Difficulty</div>
                   </div>
                 </div>
 
@@ -311,33 +399,6 @@ export default function GeneratePage() {
                     <li key={index}>{index + 1}. {instruction}</li>
                   ))}
                 </ol>
-
-                {/* Action Buttons */}
-                <div className="flex justify-stretch">
-                  <div className="flex flex-1 gap-3 flex-wrap px-4 py-3 justify-start">
-                    <button
-                      onClick={handleSaveRecipe}
-                      className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#ee6c2b] text-[#fcf9f8] text-sm font-bold leading-normal tracking-[0.015em]"
-                    >
-                      <span className="truncate">Save Recipe</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        // TODO: Implement share functionality
-                        alert('Share functionality coming soon!')
-                      }}
-                      className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#f3ebe7] text-[#1b120d] text-sm font-bold leading-normal tracking-[0.015em]"
-                    >
-                      <span className="truncate">Share</span>
-                    </button>
-                    <button
-                      onClick={handleGenerateNew}
-                      className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#f3ebe7] text-[#1b120d] text-sm font-bold leading-normal tracking-[0.015em]"
-                    >
-                      <span className="truncate">Generate New Recipe</span>
-                    </button>
-                  </div>
-                </div>
               </div>
             )}
 

@@ -324,7 +324,7 @@ function generateRecipeFromTemplate(request: RecipeGenerationRequest): Recipe {
           request.ingredients[Math.floor(Math.random() * request.ingredients.length)] || ing.name
   }))
 
-  const recipe = {
+  const recipe: Recipe = {
     id: `template-${Date.now()}`,
     title: template.title,
     description: template.description,
@@ -333,15 +333,14 @@ function generateRecipeFromTemplate(request: RecipeGenerationRequest): Recipe {
     prepTime: template.prepTime,
     cookTime: template.cookTime,
     servings: request.servings || template.servings,
-    difficulty: template.difficulty,
+    difficulty: template.difficulty as 'easy' | 'medium' | 'hard',
     cuisine: request.cuisinePreference || template.cuisine,
     dietaryTags: template.dietaryTags,
+    imageUrl: getFallbackImage(template.title),
     createdAt: new Date(),
     updatedAt: new Date()
   }
 
-  // Add a fallback image for template recipes
-  recipe.imageUrl = getFallbackImage(recipe.title)
   console.log('Template recipe image URL:', recipe.imageUrl)
   
   // Double-check we have an image URL

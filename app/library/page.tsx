@@ -127,6 +127,27 @@ export default function LibraryPage() {
     return `https://images.unsplash.com/photo-${imageUrls[imageIndex - 1]}?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80`
   }
 
+  // Helper function to truncate description at word boundaries
+  const truncateDescription = (description: string) => {
+    if (!description) return ''
+    
+    // Truncate to approximately 80 characters, but ensure we don't cut mid-word
+    const maxLength = 80
+    if (description.length <= maxLength) return description
+    
+    // Find the last space within the limit
+    const truncated = description.substring(0, maxLength)
+    const lastSpaceIndex = truncated.lastIndexOf(' ')
+    
+    if (lastSpaceIndex === -1) {
+      // No space found, just truncate and add ellipsis
+      return description.substring(0, maxLength) + '...'
+    }
+    
+    // Truncate at the last space and add ellipsis
+    return truncated.substring(0, lastSpaceIndex) + '...'
+  }
+
   return (
     <div
       className="relative flex size-full min-h-screen flex-col bg-[#fcf9f8] group/design-root overflow-x-hidden"
@@ -232,11 +253,11 @@ export default function LibraryPage() {
                     )}
                   </div>
                 ) : (
-                  <div className="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
                     {recipes.map((recipe) => (
                       <div 
                         key={recipe.id} 
-                        className="flex flex-col gap-3 pb-3 cursor-pointer hover:opacity-80 transition-opacity"
+                        className="flex flex-col gap-3 pb-3 cursor-pointer hover:opacity-80 transition-opacity bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"
                         onClick={() => handleRecipeClick(recipe)}
                       >
                         <div
@@ -247,9 +268,13 @@ export default function LibraryPage() {
                               : `url("${getRecipeImageUrl(recipe.id)}")`
                           }}
                         ></div>
-                        <div>
-                          <p className="text-[#1b120d] text-base font-medium leading-normal">{recipe.title}</p>
-                          <p className="text-[#9a664c] text-sm font-normal leading-normal">{recipe.description}</p>
+                        <div className="flex flex-col gap-2">
+                          <p className="text-[#1b120d] text-base font-medium leading-normal overflow-hidden text-ellipsis whitespace-nowrap">{recipe.title}</p>
+                          <p className="text-[#9a664c] text-sm font-normal leading-normal overflow-hidden text-ellipsis" style={{ 
+                            display: '-webkit-box',
+                            WebkitLineClamp: 3,
+                            WebkitBoxOrient: 'vertical'
+                          }}>{truncateDescription(recipe.description || '')}</p>
                         </div>
                       </div>
                     ))}

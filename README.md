@@ -38,27 +38,6 @@ npm run dev
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## 🏗️ Project Structure
-
-```
-pantry-genie/
-├── app/
-│   ├── components/          # React components
-│   │   ├── navigation.tsx   # Main navigation
-│   │   ├── recipe-card.tsx  # Recipe display component
-│   │   └── recipe-generator.tsx # Recipe generation form
-│   ├── lib/                 # Utility functions and services
-│   │   └── ai-service.ts    # Mock AI service
-│   ├── types/               # TypeScript type definitions
-│   │   └── recipe.ts        # Recipe-related types
-│   ├── library/             # Recipe library page
-│   │   └── page.tsx         # Saved recipes view
-│   ├── layout.tsx           # Root layout
-│   ├── page.tsx             # Home page
-│   └── globals.css          # Global styles
-├── public/                  # Static assets
-└── package.json
-```
 
 ## 🎯 Core Components
 

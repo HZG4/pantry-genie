@@ -98,6 +98,85 @@ export const recipeService = {
     }
   },
 
+  // Check if a recipe already exists for a user
+  async checkRecipeExists(recipe: Recipe, userId: string): Promise<boolean> {
+    try {
+      // Check if we're in browser environment
+      if (typeof window === 'undefined') {
+        return false
+      }
+
+      // Check if user is authenticated first
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        return false
+      }
+
+      // Check for existing recipe with same title (most common case)
+      const { data, error } = await supabase
+        .from('saved_recipes')
+        .select('id, title, ingredients')
+        .eq('user_id', userId)
+        .eq('title', recipe.title)
+        .limit(1)
+
+      if (error) {
+        console.error('Error checking recipe existence:', error)
+        return false
+      }
+
+      // If we found a recipe with the same title, consider it a duplicate
+      if (data && data.length > 0) {
+        return true
+      }
+
+      // Additional check: Look for recipes with very similar ingredient lists
+      // This helps catch cases where the same recipe might have slightly different titles
+      const { data: similarRecipes, error: similarError } = await supabase
+        .from('saved_recipes')
+        .select('id, title, ingredients')
+        .eq('user_id', userId)
+        .limit(10)
+
+      if (similarError) {
+        console.error('Error checking similar recipes:', similarError)
+        return false
+      }
+
+      // Check if any existing recipe has very similar ingredients
+      if (similarRecipes) {
+        for (const existingRecipe of similarRecipes) {
+          if (this.areIngredientsSimilar(recipe.ingredients, existingRecipe.ingredients)) {
+            return true
+          }
+        }
+      }
+
+      return false
+    } catch (error) {
+      console.error('Database error checking recipe existence:', error)
+      return false
+    }
+  },
+
+  // Helper method to check if two ingredient lists are similar
+  areIngredientsSimilar(ingredients1: any[], ingredients2: any[]): boolean {
+    if (!ingredients1 || !ingredients2) return false
+    
+    // Normalize ingredient names for comparison
+    const normalizeIngredient = (ingredient: any) => 
+      ingredient.name?.toLowerCase().trim().replace(/[^\w\s]/g, '') || ''
+    
+    const names1 = ingredients1.map(normalizeIngredient).sort()
+    const names2 = ingredients2.map(normalizeIngredient).sort()
+    
+    // If ingredient lists are very similar (80% match), consider them duplicates
+    const commonIngredients = names1.filter(name => names2.includes(name))
+    const similarity = commonIngredients.length / Math.max(names1.length, names2.length)
+    
+    return similarity >= 0.8
+  },
+
   // Save a new recipe
   async saveRecipe(recipe: Recipe, userId: string): Promise<Recipe> {
     try {
